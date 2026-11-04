@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- `--check` now prints a diff of each change instead of only `Would format <file>`, in the style of `rustfmt --check`. Each hunk starts with `Diff in <file> at line <n>:`, followed by the removed (`-`) and added (`+`) lines with three lines of context. Removed and added lines are coloured red and green when the output is a terminal.
+
 ### Fixed
 
 - `--format-tables` no longer deletes table lines that hold no cell, such as the continuation lines of a multi-line cell or preprocessor directives (`ifdef::`, `ifndef::`, `endif::`). Tables with such lines are now left unchanged.
