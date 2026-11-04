@@ -4,7 +4,7 @@
 
   <groupId>org.drjekyll</groupId>
   <artifactId>adocfmt-parent</artifactId>
-  <version>0.3.2</version>
+  <version>0.3.2-oadr</version>
   <packaging>pom</packaging>
 
   <name>adocfmt-parent</name>
