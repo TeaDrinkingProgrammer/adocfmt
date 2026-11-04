@@ -110,6 +110,44 @@ class AsciidocFormatterTest {
   }
 
   @Test
+  void oneSentencePerLineInListItems() throws Exception {
+    AsciidocFormatterConfig config =
+        AsciidocFormatterConfig.builder().oneSentencePerLine(true).build();
+    testResource(
+        "fixtures/lists/listItemSentencesBefore.adoc",
+        "fixtures/lists/listItemSentencesAfter.adoc",
+        config);
+  }
+
+  @Test
+  void oneSentencePerLineInListItemsPreservesSemantics() throws Exception {
+    String input = readResource("fixtures/lists/listItemSentencesBefore.adoc");
+    AsciidocFormatter formatter =
+        new AsciidocFormatter(AsciidocFormatterConfig.builder().oneSentencePerLine(true).build());
+    String output = formatter.format(input);
+    assertThat(formatter.format(output)).as("idempotent").isEqualTo(output);
+    try (Asciidoctor asciidoctor = Asciidoctor.Factory.create()) {
+      Options options = Options.builder().safe(SafeMode.SAFE).standalone(false).build();
+      assertThat(normalizeHtml(asciidoctor.convert(output, options)))
+          .isEqualTo(normalizeHtml(asciidoctor.convert(input, options)));
+    }
+  }
+
+  @Test
+  void formatStringPreservesCalloutSemantics() throws UnsupportedLineEndingException {
+    String input =
+        "[source,ruby]\n----\nrequire 'sinatra' <1>\nget '/hi' do <2>\n----\n"
+            + "<1> Library import\n<2> URL mapping\n";
+    String output = new AsciidocFormatter(ALL_OPTIONS).format(input);
+    assertThat(output).isEqualTo(input);
+    try (Asciidoctor asciidoctor = Asciidoctor.Factory.create()) {
+      Options options = Options.builder().safe(SafeMode.SAFE).standalone(false).build();
+      assertThat(normalizeHtml(asciidoctor.convert(output, options)))
+          .isEqualTo(normalizeHtml(asciidoctor.convert(input, options)));
+    }
+  }
+
+  @Test
   void formatStringPreservesCrlfLineEndings() throws UnsupportedLineEndingException {
     AsciidocFormatter formatter =
         new AsciidocFormatter(
@@ -188,6 +226,22 @@ class AsciidocFormatterTest {
         "fixtures/table/includesInTables.adoc",
         "fixtures/table/includesInTables.adoc",
         ALL_OPTIONS);
+  }
+
+  @Test
+  void keepsCellContinuationLines() throws Exception {
+    testResource(
+        "fixtures/table/continuationLines.adoc",
+        "fixtures/table/continuationLines.adoc",
+        AsciidocFormatterConfig.builder().build());
+  }
+
+  @Test
+  void keepsPreprocessorDirectivesInTables() throws Exception {
+    testResource(
+        "fixtures/table/preprocessorDirectives.adoc",
+        "fixtures/table/preprocessorDirectives.adoc",
+        AsciidocFormatterConfig.builder().build());
   }
 
   // -------------------------------------------------------------------------

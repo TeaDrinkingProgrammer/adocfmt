@@ -18,7 +18,7 @@ The following transformations are available (default state shown):
 |----------------------------------|---------|--------------------------------------------------------------------------|
 | Normalize setext headings        | **on**  | Convert underline-style headings to ATX-style (`=` prefix)               |
 | Collapse consecutive blank lines | **on**  | Reduce runs of multiple blank lines to a single blank line               |
-| One sentence per line            | **on**  | Reflow paragraph text so each sentence starts on its own line            |
+| One sentence per line            | **on**  | Reflow paragraphs and list items so each sentence starts on its own line |
 | Normalize block delimiters       | **on**  | Shorten delimiter lines to exactly four characters (e.g. `----`)         |
 | Remove trailing header `=` signs | **on**  | Strip trailing `=` from headings (e.g. `== Title ==` → `== Title`)       |
 | Remove trailing whitespace       | **on**  | Strip trailing whitespace from every line                                |
@@ -93,7 +93,7 @@ More text.
 
 ### One Sentence Per Line
 
-Each sentence in a paragraph is placed on its own line.
+Each sentence in a paragraph or list item is placed on its own line.
 This produces minimal, meaningful diffs: editing one sentence touches exactly one line,
 and adding a sentence does not reflow the paragraph.
 
@@ -105,6 +105,20 @@ AsciiDoc is a lightweight markup language. It is used for writing documentation.
 AsciiDoc is a lightweight markup language.
 It is used for writing documentation.
 It can be converted to HTML, PDF, and other formats.
+```
+
+In a list item, the list marker stays in front of the first sentence.
+A sentence that would start with a list marker (such as `2.`) stays on the line before,
+because on its own line it would start a new list item.
+
+```asciidoc
+// Before
+* AsciiDoc is a lightweight
+markup language. It is used for writing documentation.
+
+// After
+* AsciiDoc is a lightweight markup language.
+It is used for writing documentation.
 ```
 
 Common abbreviations (e.g. `Dr.`, `etc.`, `ca.`) are recognised and do not trigger a split.
@@ -257,7 +271,7 @@ Requires Java 17+. Add the core module to your project:
 <dependency>
     <groupId>org.drjekyll</groupId>
     <artifactId>adocfmt</artifactId>
-    <version>0.3.1</version>
+    <version>0.3.2</version>
     </dependency>
 ```
 
@@ -317,7 +331,7 @@ Usage: adocfmt [-chVw] [-cbl[=<true|false>]] [-ehlb[=<true|false>]]
 |                   Option                    | Default |                                Description                                |
 |---------------------------------------------|---------|---------------------------------------------------------------------------|
 | `-w`, `--write`                             | --      | Write formatted content back to files                                     |
-| `-c`, `--check`                             | --      | Check formatting without modifying files; exit 1 if any file would change |
+| `-c`, `--check`                             | --      | Print a diff and exit 1 if any file would change; leaves files unmodified |
 | `-nsh`, `--normalize-setext-headings`       | `true`  | Convert setext headings to ATX                                            |
 | `-cbl`, `--collapse-blank-lines`            | `true`  | Collapse consecutive blank lines                                          |
 | `-ols`, `--one-sentence-per-line`           | `true`  | One sentence per line                                                     |
@@ -360,7 +374,7 @@ adocfmt my.adoc
 # Format stdin to stdout
 cat my.adoc | adocfmt
 
-# Check formatting in CI -- exits 1 if any file would change
+# Check formatting in CI -- prints a diff and exits 1 if any file would change
 adocfmt --check docs/*.adoc
 
 # Check all .adoc files in a directory tree in CI
@@ -393,7 +407,7 @@ Add the following to your `.pre-commit-config.yaml`:
 ```yaml
 repos:
   - repo: https://github.com/dheid/adocfmt
-    rev: v0.3.1
+    rev: v0.3.2
     hooks:
       - id: adocfmt        # formats .adoc/.asciidoc files in place
       - id: adocfmt-check  # CI mode: fails if any file would change
@@ -423,7 +437,7 @@ Directories are walked recursively.
 ```yaml
 steps:
   - uses: actions/checkout@v6
-  - uses: dheid/adocfmt@v0.3.1
+  - uses: dheid/adocfmt@v0.3.2
     with:
       mode: check    # default — can be omitted
       paths: .       # default — whole repo
@@ -439,7 +453,7 @@ or [peter-evans/create-pull-request](https://github.com/peter-evans/create-pull-
 ```yaml
 steps:
   - uses: actions/checkout@v6
-  - uses: dheid/adocfmt@v0.3.1
+  - uses: dheid/adocfmt@v0.3.2
     with:
       mode: write
       paths: docs     # limit to a subdirectory
@@ -452,7 +466,7 @@ steps:
 |-----------|---------|--------------------------------------------------------------------------|
 | `mode`    | `check` | `check` or `write`                                                       |
 | `paths`   | `.`     | Space-separated files or directories; directories are walked recursively |
-| `version` | `0.3.1` | adocfmt version to download; override to pin to a specific release       |
+| `version` | `0.3.2` | adocfmt version to download; override to pin to a specific release       |
 
 **Notes:**
 

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- `--check` now prints a diff of each change instead of only `Would format <file>`, in the style of `rustfmt --check`. Each hunk starts with `Diff in <file> at line <n>:`, followed by the removed (`-`) and added (`+`) lines with three lines of context. Removed and added lines are coloured red and green when the output is a terminal.
+
+### Fixed
+
+- `--format-tables` no longer deletes table lines that hold no cell, such as the continuation lines of a multi-line cell or preprocessor directives (`ifdef::`, `ifndef::`, `endif::`). Tables with such lines are now left unchanged.
+- One-sentence-per-line now reflows list item text the same way as paragraph text. Before, the list item line was left as is and only the lines after it were reflowed, so a wrapped item ended up half reflowed. A sentence that would start with a list marker (such as `2.`) stays on the line before. This changes the output for documents with multi-line or multi-sentence list items, so `--check` fails on those files until they are reformatted.
+
+## [0.3.2] - 2026-10-30
+
+### Fixed
+
+- One-sentence-per-line no longer joins callout list items (`<1> …`, `<.> …`) into a single paragraph, which broke their rendering.
+- `--normalize-list-bullets` no longer rewrites a `- ` line that continues a paragraph to `* `, which changed the rendered text (#38). A `- ` line is only treated as a bullet where a list can start (after a blank line, heading, block attribute, block title or delimited block) or inside an existing list.
+
 ## [0.3.1] - 2026-08-03
 
 ### Fixed

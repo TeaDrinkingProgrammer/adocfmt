@@ -20,22 +20,10 @@ jobs:
         with:
           java-version: '21'
           distribution: 'temurin'
-          server-id: central
-          server-username: CENTRAL_USERNAME
-          server-password: CENTRAL_PASSWORD
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: GPG_PASSPHRASE
           cache: 'maven'
 
       - name: Build and Package
         run: mvn -B package -DskipTests
-
-      - name: Publish Core to Maven Central
-        run: mvn -B deploy -Prelease -DskipTests -Djacoco.skip=true
-        env:
-          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
-          CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
-          GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
 
       - name: Install nFPM
         run: |
@@ -67,41 +55,3 @@ jobs:
           generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Update Homebrew Formula
-        run: |
-          VERSION=${GITHUB_REF#refs/tags/v}
-          VERSION=${VERSION#v}
-          SHA256=$(sha256sum cli/target/adocfmt.jar | awk '{print $1}')
-          URL="https://github.com/${{ github.repository }}/releases/download/v${VERSION}/adocfmt.jar"
-
-          git clone https://x-access-token:${{ secrets.HOMEBREW_TAP_TOKEN }}@github.com/drjekyll-org/homebrew-tap.git homebrew-tap
-          cd homebrew-tap
-
-          cat <<EOF > Formula/adocfmt.rb
-          class Adocfmt < Formula
-            desc "An opinionated AsciiDoc formatter"
-            homepage "https://github.com/dheid/adocfmt"
-            url "${URL}"
-            version "${VERSION}"
-            sha256 "${SHA256}"
-            license "Apache-2.0"
-
-            depends_on "openjdk@17"
-
-            def install
-              libexec.install "adocfmt.jar"
-              bin.write_jar_script libexec/"adocfmt.jar", "adocfmt", java_version: "17"
-            end
-
-            test do
-              system "#{bin}/adocfmt", "--help"
-            end
-          end
-          EOF
-
-          git config user.name "Daniel Heid"
-          git config user.email "mail@daniel-heid.de"
-          git add Formula/adocfmt.rb
-          git commit -m "Update adocfmt to ${VERSION}"
-          git push
