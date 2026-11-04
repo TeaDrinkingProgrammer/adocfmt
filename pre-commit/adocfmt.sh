@@ -4,7 +4,7 @@ set -e
 ADOCFMT_VERSION="${ADOCFMT_VERSION:-0.3.2-oadr}"
 ADOCFMT_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/adocfmt"
 ADOCFMT_CACHE_JAR="$ADOCFMT_CACHE_DIR/adocfmt-${ADOCFMT_VERSION}.jar"
-ADOCFMT_DOWNLOAD_URL="https://github.com/dheid/adocfmt/releases/download/v${ADOCFMT_VERSION}/adocfmt.jar"
+ADOCFMT_DOWNLOAD_URL="https://github.com/TeaDrinkingProgrammer/adocfmt/releases/download/v${ADOCFMT_VERSION}/adocfmt.jar"
 
 if [ -z "$ADOCFMT_JAR" ]; then
   if [ ! -f "$ADOCFMT_CACHE_JAR" ]; then
