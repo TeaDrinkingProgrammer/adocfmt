@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - `--format-tables` no longer deletes table lines that hold no cell, such as the continuation lines of a multi-line cell or preprocessor directives (`ifdef::`, `ifndef::`, `endif::`). Tables with such lines are now left unchanged.
+- One-sentence-per-line now reflows list item text the same way as paragraph text. Before, the list item line was left as is and only the lines after it were reflowed, so a wrapped item ended up half reflowed. A sentence that would start with a list marker (such as `2.`) stays on the line before. This changes the output for documents with multi-line or multi-sentence list items, so `--check` fails on those files until they are reformatted.
 
 ## [0.3.2] - 2026-10-30
 
